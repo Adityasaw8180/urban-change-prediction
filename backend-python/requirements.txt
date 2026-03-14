@@ -1,6 +1,10 @@
-flask
-flask-cors
+fastapi
+uvicorn[standard]
+torch
+torchvision
+segmentation-models-pytorch
+pillow
+opencv-python-headless
 numpy
-scikit-learn
-joblib
-pandas
+python-multipart
+albumentations

@@ -1,108 +1,65 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Circle,
-  useMapEvents
-} from 'react-leaflet';
+import { useRef } from 'react'
+import { MapContainer, TileLayer, Marker, Circle, useMapEvents, LayersControl, Tooltip } from 'react-leaflet'
+import L from 'leaflet'
 
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete L.Icon.Default.prototype._getIconUrl;
-
+delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow
-});
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+})
 
-function ClickHandler({ setLocation, mapRef }) {
-  useMapEvents({
-    click(e) {
-      const newLoc = [e.latlng.lat, e.latlng.lng];
-      setLocation(newLoc);
+const { BaseLayer, Overlay } = LayersControl
 
-      if (mapRef.current) {
-        mapRef.current.flyTo(newLoc, 14);
-      }
-    }
-  });
-
-  return null;
+function LocationHandler({ setSelectedCoords }) {
+  useMapEvents({ click(e) { setSelectedCoords(e.latlng) } })
+  return null
 }
 
-function ResizeMap({ mapRef }) {
-  useEffect(() => {
-    setTimeout(() => {
-      if (mapRef.current) {
-        mapRef.current.invalidateSize();
-      }
-    }, 300);
-  }, []);
+export default function MapView({ selectedCoords, setSelectedCoords, results }) {
+  const defaultCenter = [16.4569, 75.8476] // Your example coords
 
-  return null;
-}
-
-export default function MapView({ location, setLocation, result }) {
-  const mapRef = useRef();
+  let growthRadius = 5000
+  if (results?.gainKm2) {
+    const extra = Number(results.gainKm2)
+    growthRadius = 5000 + Math.min(Math.sqrt(extra / Math.PI) * 1500, 10000)
+  }
 
   return (
-    <MapContainer
-      center={[16.4569, 75.8476]}
-      zoom={7}
-      style={{ height: '100%', width: '100%' }}
-      whenCreated={(map) => {
-        mapRef.current = map;
-      }}
-    >
-      <ResizeMap mapRef={mapRef} />
-
-      {/* Satellite */}
-      <TileLayer
-        attribution="Esri"
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      />
-
-      {/* Labels */}
-      <TileLayer
-        attribution="OSM"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        opacity={0.35}
-      />
-
-      {/* Marker + blue circle only after click */}
-      {location && (
-        <>
-          <Marker position={location} />
-
-          <Circle
-            center={location}
-            radius={5000}
-            pathOptions={{
-              color: 'blue',
-              fillOpacity: 0.15
-            }}
+    <MapContainer center={selectedCoords || defaultCenter} zoom={10} style={{ height: '100%', width: '100%' }}>
+      <LayersControl position="topright">
+        <BaseLayer checked name="Satellite">
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution='© Esri'
           />
+        </BaseLayer>
+        <Overlay checked name="Labels">
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+            attribution='© OpenStreetMap contributors © CARTO'
+            subdomains="abcd"
+          />
+        </Overlay>
+      </LayersControl>
+
+      <LocationHandler setSelectedCoords={setSelectedCoords} />
+
+      {selectedCoords && (
+        <>
+          <Circle center={selectedCoords} radius={5000} color="#22c55e" fillOpacity={0.08} weight={2}>
+            <Tooltip permanent direction="top" offset={[0, -10]} className="custom-tooltip">
+              Current Classification
+            </Tooltip>
+          </Circle>
+
+          {results && growthRadius > 5000 && (
+            <Circle center={selectedCoords} radius={growthRadius} color="#f97316" fillOpacity={0.12} weight={2} dashArray="5 5" />
+          )}
+
+          <Marker position={selectedCoords} />
         </>
       )}
-
-      {/* Orange circle only after prediction */}
-      {location && result && (
-        <Circle
-          center={location}
-          radius={7000}
-          pathOptions={{
-            color: 'orange',
-            fillOpacity: 0.12
-          }}
-        />
-      )}
-
-      <ClickHandler setLocation={setLocation} mapRef={mapRef} />
     </MapContainer>
-  );
+  )
 }

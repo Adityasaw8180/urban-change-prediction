@@ -1,72 +1,267 @@
-body {
-  margin: 0;
-  background: #0b0e14;
-  font-family: Arial;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-html,
-body,
-#root {
+html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+.app {
   height: 100%;
-}
-
-.container {
   display: flex;
-  height: 100vh;
-  padding: 10px;
-  gap: 10px;
-}
-
-.sidebar,
-.results {
-  width: 320px;
-  background: #111827;
-  color: white;
-  padding: 20px;
-  border-radius: 16px;
-}
-
-.map-section {
-  flex: 1;
-  height: 100%;
-  border-radius: 16px;
+  background: #0f172a;
+  color: #e2e8f0;
   overflow: hidden;
 }
 
-.leaflet-container {
-  width: 100%;
+.map-container {
+  flex: 1;
+  position: relative;
   height: 100%;
 }
 
-input,
-select {
+:global(.leaflet-container) {
+  height: 100% !important;
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  background: #1f2937;
+  background: #020617;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 340px;
+  background: #1e293b;
+  padding: 24px 20px;
+  overflow-y: auto;
+  border-right: 1px solid #334155;
+}
+
+.sidebar h1 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: #60a5fa;
+}
+
+.sidebar p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+.coords-box {
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid #334155;
+}
+
+.coords-box strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+.coords-value {
+  font-weight: 600;
+  color: #60a5fa;
+}
+
+/* Inputs */
+label {
+  display: block;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+select, input[type="range"] {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+}
+
+input[type="range"] {
+  accent-color: #22c55e;
+}
+
+button.analyze {
+  width: 100%;
+  padding: 14px;
+  margin-top: 24px;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  background: #10b981;
-  border: none;
-  border-radius: 20px;
+button.analyze:disabled {
+  background: #4ade80;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Results Panel */
+.results-panel {
+  width: 380px;
+  background: #1e293b;
+  padding: 24px 20px;
+  overflow-y: auto;
+  border-left: 1px solid #334155;
+}
+
+.results-panel h2 {
+  font-size: 1.4rem;
+  color: #60a5fa;
+  margin-bottom: 20px;
+}
+
+.stat-group {
+  margin-bottom: 28px;
+}
+
+.stat-group h3 {
+  font-size: 1.1rem;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+  font-size: 0.95rem;
+}
+
+.stat-label {
+  color: #94a3b8;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.growth {
+  color: #f97316 !important;
   font-weight: bold;
 }
 
-.results-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.progress-bar {
+  height: 8px;
+  background: #334155;
+  border-radius: 4px;
+  margin-top: 6px;
+  overflow: hidden;
 }
 
-.stat-card {
-  background: #1f2937;
-  padding: 12px;
-  border-radius: 10px;
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #f97316, #fb923c);
+}
+
+.stable .progress-fill { background: #22c55e; }
+
+.classification {
+  margin-top: 16px;
+}
+
+.class-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+/* Loader */
+.loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  color: white;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid #334155;
+  border-top: 6px solid #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ────────────────────────────────────────────────
+   Tight layout – minimal wasted space on sides
+───────────────────────────────────────────────── */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-layout {
+  height: 100%;
+  display: flex;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Left sidebar – narrower + no extra padding on sides */
+.sidebar {
+  width: 320px;               /* reduced from 340px */
+  background: #1e293b;
+  padding: 20px 12px;         /* less horizontal padding */
+  overflow-y: auto;
+  border-right: 1px solid #334155;
+}
+
+/* Map – takes all remaining space, no margin/padding */
+.map-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 0;               /* prevents overflow issues */
+  height: 100%;
+}
+
+/* Right panel – narrower + tighter padding */
+.results-panel {
+  width: 340px;               /* reduced from 360–380px */
+  background: #1e293b;
+  padding: 20px 12px;         /* less horizontal padding */
+  overflow-y: auto;
+  border-left: 1px solid #334155;
+}
+
+/* Force Leaflet to fill exactly */
+:global(.leaflet-container) {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #020617;
+}
+
+/* Optional: make sure no global margins interfere */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
