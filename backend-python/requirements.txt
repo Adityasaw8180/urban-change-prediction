@@ -8,3 +8,5 @@ opencv-python-headless
 numpy
 python-multipart
 albumentations
+scikit-learn
+joblib

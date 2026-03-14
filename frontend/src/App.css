@@ -1,34 +1,41 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* 1. Reset & Global Setup */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
 
-html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; }
+html, body, #root { 
+  height: 100%; 
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+  background: #0f172a; 
+  overflow: hidden; /* Prevents unwanted scrollbars on the main page */
+}
 
-.app {
-  height: 100%;
+/* 2. Main Layout Container 
+   This is the fix: width: 100vw and display: flex 
+*/
+.app, .app-layout {
   display: flex;
+  width: 100vw;
+  height: 100vh;
   background: #0f172a;
   color: #e2e8f0;
-  overflow: hidden;
 }
 
-.map-container {
-  flex: 1;
-  position: relative;
-  height: 100%;
-}
-
-:global(.leaflet-container) {
-  height: 100% !important;
-  width: 100%;
-  background: #020617;
-}
-
-/* Sidebar */
+/* 3. Left Sidebar (Fixed Width) */
 .sidebar {
-  width: 340px;
+  width: 320px;
+  min-width: 320px; /* Prevents the sidebar from squishing */
   background: #1e293b;
   padding: 24px 20px;
   overflow-y: auto;
   border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar h1 {
@@ -43,6 +50,39 @@ html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif
   margin-bottom: 24px;
 }
 
+/* 4. Map Section (The Flexible Middle) */
+.map-container, .map-wrapper {
+  flex: 1; /* This forces the map to take all remaining horizontal space */
+  position: relative;
+  height: 100%;
+  min-width: 0; /* Critical for Leaflet to resize correctly within Flexbox */
+}
+
+/* Leaflet specific overrides */
+:global(.leaflet-container), .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  background: #020617;
+}
+
+/* 5. Right Results Panel (Fixed Width) */
+.results-panel {
+  width: 360px;
+  min-width: 360px;
+  background: #1e293b;
+  padding: 24px 20px;
+  overflow-y: auto;
+  border-left: 1px solid #334155;
+}
+
+.results-panel h2 {
+  font-size: 1.4rem;
+  color: #60a5fa;
+  margin-bottom: 20px;
+}
+
+/* 6. Form Elements & Inputs */
 .coords-box {
   background: #0f172a;
   border-radius: 8px;
@@ -51,19 +91,11 @@ html, body, #root { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif
   border: 1px solid #334155;
 }
 
-.coords-box strong {
-  display: block;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  color: #cbd5e1;
-}
-
 .coords-value {
   font-weight: 600;
   color: #60a5fa;
 }
 
-/* Inputs */
 label {
   display: block;
   font-size: 0.85rem;
@@ -79,6 +111,7 @@ select, input[type="range"] {
   border-radius: 6px;
   color: #e2e8f0;
   font-size: 0.95rem;
+  margin-bottom: 16px;
 }
 
 input[type="range"] {
@@ -88,7 +121,7 @@ input[type="range"] {
 button.analyze {
   width: 100%;
   padding: 14px;
-  margin-top: 24px;
+  margin-top: 10px;
   background: #22c55e;
   color: white;
   border: none;
@@ -99,35 +132,19 @@ button.analyze {
   transition: background 0.2s;
 }
 
+button.analyze:hover {
+  background: #16a34a;
+}
+
 button.analyze:disabled {
   background: #4ade80;
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Results Panel */
-.results-panel {
-  width: 380px;
-  background: #1e293b;
-  padding: 24px 20px;
-  overflow-y: auto;
-  border-left: 1px solid #334155;
-}
-
-.results-panel h2 {
-  font-size: 1.4rem;
-  color: #60a5fa;
-  margin-bottom: 20px;
-}
-
+/* 7. Stats & Visualization */
 .stat-group {
   margin-bottom: 28px;
-}
-
-.stat-group h3 {
-  font-size: 1.1rem;
-  color: #cbd5e1;
-  margin-bottom: 12px;
 }
 
 .stat {
@@ -135,21 +152,6 @@ button.analyze:disabled {
   justify-content: space-between;
   align-items: center;
   margin: 12px 0;
-  font-size: 0.95rem;
-}
-
-.stat-label {
-  color: #94a3b8;
-}
-
-.stat-value {
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.growth {
-  color: #f97316 !important;
-  font-weight: bold;
 }
 
 .progress-bar {
@@ -167,18 +169,7 @@ button.analyze:disabled {
 
 .stable .progress-fill { background: #22c55e; }
 
-.classification {
-  margin-top: 16px;
-}
-
-.class-item {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  font-size: 0.9rem;
-}
-
-/* Loader */
+/* 8. Loader & Animations */
 .loader-overlay {
   position: absolute;
   inset: 0;
@@ -188,80 +179,116 @@ button.analyze:disabled {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  color: white;
 }
 
 .spinner {
-  width: 56px;
-  height: 56px;
-  border: 6px solid #334155;
-  border-top: 6px solid #60a5fa;
+  width: 50px;
+  height: 50px;
+  border: 5px solid #334155;
+  border-top: 5px solid #60a5fa;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
 
-/* ────────────────────────────────────────────────
-   Tight layout – minimal wasted space on sides
-───────────────────────────────────────────────── */
-
+/* 1. Force the root to never exceed the screen */
 html, body, #root {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden; /* Prevents the 'moving' or shifting effect */
 }
 
-.app-layout {
-  height: 100%;
+/* 2. The App Container */
+.app, .app-layout {
   display: flex;
+  width: 100%;      /* Use 100% instead of 100vw to handle scrollbars better */
+  height: 100vh;
+  position: fixed;  /* Locks the app to the viewport */
+  top: 0;
+  left: 0;
   background: #0f172a;
-  color: #e2e8f0;
 }
 
-/* Left sidebar – narrower + no extra padding on sides */
-.sidebar {
-  width: 320px;               /* reduced from 340px */
-  background: #1e293b;
-  padding: 20px 12px;         /* less horizontal padding */
+/* 3. Sidebars: Use flex-shrink: 0 to stop them from closing/moving */
+.sidebar, .results-panel {
+  height: 100%;
+  flex-shrink: 0;   /* CRITICAL: Prevents panels from closing/shrinking when zooming */
   overflow-y: auto;
+  background: #1e293b;
+  z-index: 10;      /* Keeps panels above the map */
+}
+
+.sidebar {
+  width: 320px;
   border-right: 1px solid #334155;
 }
 
-/* Map – takes all remaining space, no margin/padding */
-.map-wrapper {
-  flex: 1;
-  position: relative;
-  min-width: 0;               /* prevents overflow issues */
-  height: 100%;
-}
-
-/* Right panel – narrower + tighter padding */
 .results-panel {
-  width: 340px;               /* reduced from 360–380px */
-  background: #1e293b;
-  padding: 20px 12px;         /* less horizontal padding */
-  overflow-y: auto;
+  width: 360px;
   border-left: 1px solid #334155;
 }
 
-/* Force Leaflet to fill exactly */
-:global(.leaflet-container) {
+/* 4. The Map: The only element allowed to change size */
+.map-container, .map-wrapper {
+  flex: 1;          /* Takes up exactly what is left */
+  min-width: 0;     /* Allows the map to shrink if needed without breaking flex */
+  height: 100%;
+  position: relative;
+}
+
+/* Ensure Leaflet stays contained */
+.leaflet-container {
   height: 100% !important;
   width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: #020617;
 }
 
-/* Optional: make sure no global margins interfere */
-* {
-  box-sizing: border-box;
+/* Container for the progress bar (The background/empty part) */
+.progress-bar {
+  height: 8px;
+  width: 100%;
+  background: #0f172a; /* This matches your "website color" (dark blue-black) */
+  border-radius: 10px;
+  margin: 8px 0 16px 0;
+  overflow: hidden; /* Clips the inner fill to the rounded corners */
+  border: 1px solid #334155; /* Optional: adds a slight definition to the empty part */
 }
 
-body {
-  margin: 0;
-  padding: 0;
+/* The actual colored part */
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s ease-in-out; /* Makes the bars slide when data loads */
+}
+
+/* Stat Text Styling */
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.stat-label {
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.stat-value {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.stat-group h3 {
+  font-size: 0.85rem;
+  color: #60a5fa;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 4px;
 }
