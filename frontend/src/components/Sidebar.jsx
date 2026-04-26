@@ -54,7 +54,7 @@ export default function Sidebar({
         {loading ? 'Analyzing...' : hasResult ? 'Result Ready' : 'Analyze & Predict'}
       </button>
 
-      <div style={{ marginTop: 32 }}>
+      {/* <div style={{ marginTop: 32 }}>
         <strong>MAP LAYERS</strong>
         <ul style={{ listStyle: 'none', marginTop: 12, fontSize: '0.9rem', color: '#94a3b8' }}>
           <li>• Satellite</li>
@@ -62,7 +62,7 @@ export default function Sidebar({
           <li>• Current View (selected)</li>
           <li>• Change Detection</li>
         </ul>
-      </div>
+      </div> */}
     </div>
   )
 }

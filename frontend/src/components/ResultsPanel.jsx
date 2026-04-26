@@ -68,45 +68,48 @@ export default function ResultsPanel({ results, predictYears }) {
         </div>
       </div>
 
-      <div className="stat-group">
-        <h3>CURRENT CLASSIFICATION</h3>
-        
-        {/* Urban - Orange */}
-        <div className="stat">
-          <span className="stat-label">Urban</span>
-          <span className="stat-value">{results.urbanPct}</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: results.urbanPct, background: '#f97316' }} />
-        </div>
-
-        {/* Vegetation - Green */}
-        <div className="stat">
-          <span className="stat-label">Vegetation</span>
-          <span className="stat-value">{results.vegetationPct}</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: results.vegetationPct, background: '#22c55e' }} />
-        </div>
-
-        {/* Water - Blue */}
-        <div className="stat">
-          <span className="stat-label">Water</span>
-          <span className="stat-value">{results.waterPct}</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: results.waterPct, background: '#3b82f6' }} />
-        </div>
-
-        {/* Bare Land - Gold */}
-        <div className="stat">
-          <span className="stat-label">Bare Land</span>
-          <span className="stat-value">{results.barePct}</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: results.barePct, background: '#ca8a04' }} />
-        </div>
-      </div>
+      
     </div>
   );
 }
+
+
+// <div className="stat-group">
+//         <h3>CURRENT CLASSIFICATION</h3>
+        
+//         {/* Urban - Orange */}
+//         <div className="stat">
+//           <span className="stat-label">Urban</span>
+//           <span className="stat-value">{results.urbanPct}</span>
+//         </div>
+//         <div className="progress-bar">
+//           <div className="progress-fill" style={{ width: results.urbanPct, background: '#f97316' }} />
+//         </div>
+
+//         {/* Vegetation - Green */}
+//         <div className="stat">
+//           <span className="stat-label">Vegetation</span>
+//           <span className="stat-value">{results.vegetationPct}</span>
+//         </div>
+//         <div className="progress-bar">
+//           <div className="progress-fill" style={{ width: results.vegetationPct, background: '#22c55e' }} />
+//         </div>
+
+//         {/* Water - Blue */}
+//         <div className="stat">
+//           <span className="stat-label">Water</span>
+//           <span className="stat-value">{results.waterPct}</span>
+//         </div>
+//         <div className="progress-bar">
+//           <div className="progress-fill" style={{ width: results.waterPct, background: '#3b82f6' }} />
+//         </div>
+
+//         {/* Bare Land - Gold */}
+//         <div className="stat">
+//           <span className="stat-label">Bare Land</span>
+//           <span className="stat-value">{results.barePct}</span>
+//         </div>
+//         <div className="progress-bar">
+//           <div className="progress-fill" style={{ width: results.barePct, background: '#ca8a04' }} />
+//         </div>
+//       </div>

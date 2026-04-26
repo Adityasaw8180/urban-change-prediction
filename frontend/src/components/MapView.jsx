@@ -1,7 +1,8 @@
-import { useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Circle, useMapEvents, LayersControl, Tooltip } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Circle, useMapEvents, LayersControl } from 'react-leaflet'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
+// Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -12,49 +13,66 @@ L.Icon.Default.mergeOptions({
 const { BaseLayer, Overlay } = LayersControl
 
 function LocationHandler({ setSelectedCoords }) {
-  useMapEvents({ click(e) { setSelectedCoords(e.latlng) } })
+  useMapEvents({
+    click(e) {
+      setSelectedCoords(e.latlng)
+    },
+  })
   return null
 }
 
 export default function MapView({ selectedCoords, setSelectedCoords, results }) {
-  const defaultCenter = [16.4569, 75.8476] // Your example coords
+  const kolhapurCenter = [16.7050, 74.2433] 
+  const cityZoom = 13 
 
-  let growthRadius = 5000
-  if (results?.gainKm2) {
-    const extra = Number(results.gainKm2)
-    growthRadius = 5000 + Math.min(Math.sqrt(extra / Math.PI) * 1500, 10000)
-  }
+  const redRadius = 3000 
 
   return (
-    <MapContainer center={selectedCoords || defaultCenter} zoom={10} style={{ height: '100%', width: '100%' }}>
+    <MapContainer 
+      center={kolhapurCenter} 
+      zoom={cityZoom} 
+      style={{ height: '100%', width: '100%' }}
+      scrollWheelZoom={true}
+    >
       <LayersControl position="topright">
-        <BaseLayer checked name="Satellite">
+        <BaseLayer checked name="Satellite with Labels">
           <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution='© Esri'
+            url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+            attribution='&copy; Google Maps'
           />
         </BaseLayer>
-        <Overlay checked name="Labels">
+
+        <BaseLayer name="Street Map">
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
-            attribution='© OpenStreetMap contributors © CARTO'
-            subdomains="abcd"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; OpenStreetMap contributors'
           />
-        </Overlay>
+        </BaseLayer>
       </LayersControl>
 
       <LocationHandler setSelectedCoords={setSelectedCoords} />
 
       {selectedCoords && (
         <>
-          <Circle center={selectedCoords} radius={5000} color="#22c55e" fillOpacity={0.08} weight={2}>
-            <Tooltip permanent direction="top" offset={[0, -10]} className="custom-tooltip">
-              Current Classification
-            </Tooltip>
-          </Circle>
+          {/* Green Circle: Fixed at 2km (2000 meters) - Tooltip removed */}
+          <Circle 
+            center={selectedCoords} 
+            radius={2000} 
+            color="#22c55e" 
+            fillOpacity={0.1} 
+            weight={2}
+          />
 
-          {results && growthRadius > 5000 && (
-            <Circle center={selectedCoords} radius={growthRadius} color="#f97316" fillOpacity={0.12} weight={2} dashArray="5 5" />
+          {/* Red Circle: Fixed at 3km (3000 meters) - Tooltip removed */}
+          {results && (
+            <Circle 
+              center={selectedCoords} 
+              radius={redRadius} 
+              color="#ef4444" 
+              fillOpacity={0.15} 
+              weight={2} 
+              dashArray="5 5" 
+            />
           )}
 
           <Marker position={selectedCoords} />

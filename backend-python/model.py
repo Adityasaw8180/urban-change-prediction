@@ -4,8 +4,8 @@ import segmentation_models_pytorch as smp
 def get_model():
     model = smp.Unet(
         encoder_name="resnet34",
-        encoder_weights=None,  # change to "imagenet" after real training
-        in_channels=6,         # two RGB images concatenated
+        encoder_weights=None,  
+        in_channels=6,         
         classes=1,
         activation="sigmoid"
     )
