@@ -1,29 +1,58 @@
-Urban Change Prediction
+# Urban Change Prediction
 
-Urban Change Prediction is a full-stack project designed to analyze land-use and urban development changes over time using geospatial data and prediction models. The system allows users to select locations on a map, analyze changes, and predict future urban expansion visually.
+A full-stack application that leverages satellite imagery and machine learning to predict and visualize urban expansion and growth.
 
-Project Overview
+## 🚀 Project Overview
+This project is divided into three main components:
+1.  **Frontend**: A React-based UI (using Vite) for data visualization and user interaction.
+2.  **Backend (Node.js)**: Acts as the primary API gateway and handles routing.
+3.  **Backend (Python)**: Handles the Machine Learning heavy lifting, model inference, and image processing using FastAPI.
 
-    This project helps detect and predict urban growth by combining:
+---
 
-    Interactive frontend map interface
+## 🛠️ Tech Stack
+- **Frontend**: React.js, Vite, CSS3
+- **Primary Backend**: Node.js, Express
+- **ML Backend**: Python, FastAPI, Uvicorn
+- **ML Libraries**: Scikit-learn (or similar), NumPy, Pandas
 
-    Backend APIs for processing data
+---
 
-    Prediction model integration
+## 📂 Folder Structure
+- `frontend/`: React source code and assets.
+- `backend-node/`: Node.js Express server and routes.
+- `backend-python/`: Python FastAPI scripts and trained `.pkl` models.
 
-    Visual output for analysis results
+---
 
-Features
+## ⚙️ Installation & Setup
 
-    Select any location on map
+### 1. Python Backend (ML Engine)
+Navigate to the python directory and install dependencies:
+```bash
+cd backend-python
+pip install -r requirements.txt
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+```
 
-    Show selected point with blue marker
+### 2. Node Backend (API Gateway)
+Navigate to the Node directory and install dependencies:
+```bash
+cd backend-node
+npm install
+npm start
+```
 
-    Run analysis and prediction
+### 3. Frontend (UI)
+Navigate to the frontend directory and install dependencies:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+## 🛰️ Key Features
+ 1. Map View: Interactive visualization of geographical data.
 
-    Display predicted urban growth with orange circle
-
-    Right-side result panel with prediction details
-
-    Separate frontend and backend architecture
+ 2. Urban Prediction: Trigger analysis to see predicted growth patterns.
+ 
+ 3. Results Panel: Detailed breakdown of prediction statistics.
