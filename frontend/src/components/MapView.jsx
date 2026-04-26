@@ -1,83 +1,85 @@
-import { MapContainer, TileLayer, Marker, Circle, useMapEvents, LayersControl } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import { MapContainer, TileLayer, Marker, Circle, GeoJSON,
+         useMapEvents, useMap } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icons in React-Leaflet
-delete L.Icon.Default.prototype._getIconUrl
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
-
-const { BaseLayer, Overlay } = LayersControl
+  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
 function LocationHandler({ setSelectedCoords }) {
-  useMapEvents({
-    click(e) {
-      setSelectedCoords(e.latlng)
-    },
-  })
-  return null
+  useMapEvents({ click(e) { setSelectedCoords(e.latlng); } });
+  return null;
 }
 
-export default function MapView({ selectedCoords, setSelectedCoords, results }) {
-  const kolhapurCenter = [16.7050, 74.2433] 
-  const cityZoom = 13 
+// Renders GeoJSON zone polygons — choropleth style like the reference image
+function ZoneLayer({ geojson, showHeatmap }) {
+  const map     = useMap();
+  const layerRef = useRef(null);
 
-  const redRadius = 3000 
+  useEffect(() => {
+    // Remove old layer
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+      layerRef.current = null;
+    }
+    if (!geojson || !showHeatmap) return;
 
+    layerRef.current = L.geoJSON(geojson, {
+      style: (feature) => ({
+        fillColor:   feature.properties.color,
+        fillOpacity: feature.properties.opacity,
+        color:       feature.properties.color,
+        weight:      1,
+        opacity:     0.7,
+      }),
+      onEachFeature: (feature, layer) => {
+        layer.bindTooltip(
+          `<strong>${feature.properties.label} Growth</strong>`,
+          { sticky: true, className: 'zone-tooltip' }
+        );
+      }
+    }).addTo(map);
+
+    return () => {
+      if (layerRef.current && map.hasLayer(layerRef.current)) {
+        map.removeLayer(layerRef.current);
+      }
+    };
+  }, [map, geojson, showHeatmap]);
+
+  return null;
+}
+
+export default function MapView({
+  selectedCoords, setSelectedCoords,
+  hasResult, showHeatmap, predictYears, geojson
+}) {
   return (
-    <MapContainer 
-      center={kolhapurCenter} 
-      zoom={cityZoom} 
-      style={{ height: '100%', width: '100%' }}
-      scrollWheelZoom={true}
-    >
-      <LayersControl position="topright">
-        <BaseLayer checked name="Satellite with Labels">
-          <TileLayer
-            url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
-            attribution='&copy; Google Maps'
-          />
-        </BaseLayer>
+    <div style={{ height: '100%', width: '100%' }}>
+      <MapContainer center={[16.691, 74.235]} zoom={13}
+                    style={{ height: '100%', width: '100%' }}>
+        <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" />
+        <LocationHandler setSelectedCoords={setSelectedCoords} />
 
-        <BaseLayer name="Street Map">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; OpenStreetMap contributors'
-          />
-        </BaseLayer>
-      </LayersControl>
-
-      <LocationHandler setSelectedCoords={setSelectedCoords} />
-
-      {selectedCoords && (
-        <>
-          {/* Green Circle: Fixed at 2km (2000 meters) - Tooltip removed */}
-          <Circle 
-            center={selectedCoords} 
-            radius={2000} 
-            color="#22c55e" 
-            fillOpacity={0.1} 
-            weight={2}
-          />
-
-          {/* Red Circle: Fixed at 3km (3000 meters) - Tooltip removed */}
-          {results && (
-            <Circle 
-              center={selectedCoords} 
-              radius={redRadius} 
-              color="#ef4444" 
-              fillOpacity={0.15} 
-              weight={2} 
-              dashArray="5 5" 
+        {selectedCoords && (
+          <>
+            <Marker position={selectedCoords} />
+            <Circle
+              center={selectedCoords}
+              radius={2000}
+              pathOptions={{ color: 'white', fill: false, weight: 1.5, dashArray: '6 6' }}
             />
-          )}
+          </>
+        )}
 
-          <Marker position={selectedCoords} />
-        </>
-      )}
-    </MapContainer>
-  )
+        {/* Choropleth zone overlay */}
+        <ZoneLayer geojson={geojson} showHeatmap={showHeatmap} />
+      </MapContainer>
+    </div>
+  );
 }
