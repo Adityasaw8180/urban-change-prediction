@@ -109,7 +109,7 @@ export default function ResultsPanel({ results, predictYears }) {
 
       {/* ── CHANGE DETECTION ── */}
       <div className="stat-group">
-        <h3>CHANGE DETECTION</h3>
+        <h3>CHANGE PREDICTION</h3>
         <div className="stat">
           <span className="stat-label">Urban Gain</span>
           <span className="stat-value" style={{ color: '#f97316' }}>+{results.gainKm2} km²</span>
